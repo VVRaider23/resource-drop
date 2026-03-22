@@ -78,9 +78,11 @@ export default function Home() {
     const normalizedUrl = url.startsWith("http") ? url : `https://${url}`;
 
     setSubmitting(true);
-    const { error: err } = await supabase.from("resources").insert([
-      { title, url: normalizedUrl, tag: form.tag, submitted_by },
-    ]);
+    const { data: inserted, error: err } = await supabase
+      .from("resources")
+      .insert([{ title, url: normalizedUrl, tag: form.tag, submitted_by }])
+      .select()
+      .single();
     setSubmitting(false);
 
     if (err) {
@@ -88,6 +90,7 @@ export default function Home() {
       return;
     }
 
+    setResources((prev) => [inserted as Resource, ...prev]);
     setForm(INITIAL_FORM);
   }
 
